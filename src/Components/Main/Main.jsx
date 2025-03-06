@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Parse from "parse";
 import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 import { createUser } from "../../Services/Users.jsx"; // Assuming this is your service for creating users
 
@@ -18,6 +19,9 @@ const Main = () => {
     e.preventDefault();
 
     try {
+      // Ensure no existing invalid session
+      await Parse.User.logOut();
+
       const createdAccount = await createUser(
         newUser.firstName,
         newUser.lastName,
@@ -28,7 +32,7 @@ const Main = () => {
       
       setCreatedUser(createdAccount); // Set the created user
       // Redirect to home page after account creation
-      navigate("/"); // Redirects user to the home page
+      navigate("/home"); // Redirects user to the home page
     } catch (error) {
       console.error("Error creating account:", error);
     }
