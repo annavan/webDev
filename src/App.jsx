@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from 'react'
 import Components from "./Components/Components.js";
 import './App.css'
 //import * as Env from './environments.js'
@@ -10,11 +10,16 @@ Env = {
   SERVER_URL: "https://parseapi.back4app.com"
 };
 
-Parse.initialize(Env.APPLICATION_ID, Env.JAVASCRIPT_KEY)
-Parse.serverURL = Env.SERVER_URL
+function App() {
 
-const App = () => {
-  return <Components />;
-};
+  return (
+    <>
+    {/* print text in black */}
+    <h1>App</h1>
+    <Components />
 
-export default App;
+    </>
+  )
+}
+
+export default App
