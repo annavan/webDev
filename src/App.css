@@ -1,4 +1,20 @@
-/* black text for h1 in app.jsx */
-h1 {
+/* change all text color to black */
+* {
+  color: black;
+}
+
+/* change button text to white */
+button {
   color: white;
+}
+
+/* change input field box color to white w black border */
+input {
+  background-color: white;
+  border: 1px solid black;
+}
+
+/* change background color to white */
+body {
+  background-color: white;
 }

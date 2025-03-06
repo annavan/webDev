@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { getUser, createUser } from "../../Services/Users.jsx";
-import MainList from "./MainList.jsx";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate hook
+import { createUser } from "../../Services/Users.jsx"; // Assuming this is your service for creating users
 
 const Main = () => {
-  const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
@@ -11,46 +10,33 @@ const Main = () => {
     email: "",
     password: "",
   });
+
   const [createdUser, setCreatedUser] = useState(null);
+  const navigate = useNavigate(); // Navigate hook for redirection
 
-  useEffect(() => {
-    getUser()
-      .then((users) => {
-        console.log("Fetched users:", users);
-        setUsers(users);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch users", err);
-      });
-  }, []);
-
-  const handleCreateAccount = (e) => {
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
-    createUser(
-      users.length + 1,
-      newUser.firstName,
-      newUser.lastName,
-      newUser.birthday,
-      newUser.email,
-      newUser.password
-    )
-      .then(() => {
-        const updatedUsers = [...users, newUser];
-        setUsers(updatedUsers);
-        setCreatedUser(newUser);
-      })
-      .catch(() => alert("Error creating account"));
-  };
 
-  const numUsersAlert = () => {
-    alert(`There are currently ${users.length} registered user(s)`);
+    try {
+      const createdAccount = await createUser(
+        newUser.firstName,
+        newUser.lastName,
+        newUser.birthday,
+        newUser.email,
+        newUser.password
+      );
+      
+      setCreatedUser(createdAccount); // Set the created user
+      // Redirect to home page after account creation
+      navigate("/"); // Redirects user to the home page
+    } catch (error) {
+      console.error("Error creating account:", error);
+    }
   };
 
   return (
     <div>
-      {createdUser ? (
-        <h1>Account created successfully! Welcome, {createdUser.firstName}!</h1>
-      ) : (
+      {!createdUser ? (
         <>
           <h1>Create Account</h1>
           <form onSubmit={handleCreateAccount}>
@@ -112,8 +98,9 @@ const Main = () => {
             <button type="submit">Create Account</button>
           </form>
         </>
+      ) : (
+        <h1>Account created successfully! Welcome, {createdUser.firstName}!</h1>
       )}
-      <MainList users={users} onNumUsersClick={numUsersAlert} />
     </div>
   );
 };

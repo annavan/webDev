@@ -2,6 +2,14 @@ import Parse from "parse";
 
 // Create a new user in Parse
 export const createUser = async (firstName, lastName, birthday, email, password) => {
+  const Account = new Parse.Object("Account"); // Create new Parse object for the Account class
+
+  // Set fields
+  Account.set("firstName", firstName);
+  Account.set("lastName", lastName);
+  Account.set("birthday", birthday);
+  Account.set("email", email);
+  Account.set("password", password); // Store securely in real applications
   try {
     const User = new Parse.User();
     User.set("username", email); // Username is required in Parse
