@@ -1,6 +1,6 @@
-//import React, { useEffect, useState } from "react";
-import React from "react";
-//import { getPosts } from "../../Services/Posts";
+import React, { useEffect, useState } from "react";
+//import React from "react";
+import { getPosts } from "../../Services/Posts";
 import HomeItem from "./HomeItem";
 
 const HomeList = ({ posts }) => {
@@ -19,7 +19,7 @@ const HomeList = ({ posts }) => {
        <h1>All Posts</h1>
        {posts.length > 0 ? (
             posts.map((post) => (
-                <HomeItem key={post.id} title={post.title} body={post.body} />
+                <HomeItem id={post.id} title={post.title} body={post.body} />
             ))
         ) : (
             <p>No posts found.</p>

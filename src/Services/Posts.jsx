@@ -8,6 +8,7 @@ export async function getPosts() {
       const results = await query.find();
       return results.map(post => ({
         id: post.id,
+        //id: post.get("objectId"),
         title: post.get("title") || "Untitled",
         body: post.get("body") || "No content",
       }));
