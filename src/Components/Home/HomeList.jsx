@@ -4,15 +4,6 @@ import { getPosts } from "../../Services/Posts";
 import HomeItem from "./HomeItem";
 
 const HomeList = ({ posts }) => {
-    // const [posts, setPosts] = useState([]);
-
-    // useEffect(() => {
-    //     async function fetchPosts() {
-    //         const data = await getPosts();
-    //         setPosts(data); 
-    //     }
-    //     fetchPosts();
-    // }, []);
 
     return (
       <div>
