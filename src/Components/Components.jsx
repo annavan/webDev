@@ -12,7 +12,8 @@ const Components = () => {
       <Router>
         <Routes>
           {/* Default redirect to login page */}
-          <Route path="/" element={<Navigate to="/login" />} />
+          {/* Change back to default login */}
+          <Route path="/" element={<Navigate to="/home" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/settings" element={<Settings />} />
