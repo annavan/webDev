@@ -1,6 +1,6 @@
 import React from "react";
 
-const MainList = ({ users = [], onNumUsersClick }) => {
+const LoginItem = ({ users = [], onNumUsersClick }) => {
   return (
     <div>
       <hr />
@@ -9,4 +9,4 @@ const MainList = ({ users = [], onNumUsersClick }) => {
   );
 };
 
-export default MainList;
+export default LoginItem;

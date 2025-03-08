@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
-import Main from "./Main/Main.jsx"; // Account creation/login page
+import LoginList from "./Login/LoginList.jsx"; // Account creation/login page
 import Home from "./Home/Home.jsx"; // Home page
 import Settings from "./Settings/Settings.jsx"; // Settings page
 import Footer from "./Footer/Footer.jsx"; // Footer component

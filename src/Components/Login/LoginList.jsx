@@ -3,7 +3,8 @@ import Parse from "parse";
 import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 import { createUser } from "../../Services/Users.jsx"; // Assuming this is your service for creating users
 
-const Main = () => {
+const LoginList = () => {
+  // initialize the state for the new user
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
@@ -19,9 +20,10 @@ const Main = () => {
     e.preventDefault();
 
     try {
-      // Ensure no existing invalid session
+      // logout any existing user
       await Parse.User.logOut();
 
+      // Create the new user
       const createdAccount = await createUser(
         newUser.firstName,
         newUser.lastName,
@@ -29,15 +31,17 @@ const Main = () => {
         newUser.email,
         newUser.password
       );
-      
+
+      // Set the created user in the state
       setCreatedUser(createdAccount); // Set the created user
       // Redirect to home page after account creation
-      navigate("/home"); // Redirects user to the home page
+      navigate("/home"); 
     } catch (error) {
       console.error("Error creating account:", error);
     }
   };
 
+  // html forms to create a new account
   return (
     <div>
       {!createdUser ? (
@@ -109,4 +113,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default LoginList;
