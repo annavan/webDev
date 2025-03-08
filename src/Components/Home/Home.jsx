@@ -1,7 +1,7 @@
 import Footer from "../Footer/Footer";
 import { useState, useEffect } from "react";
 import { getPosts } from "../../Services/Posts.jsx";
-import HomeList from "./HomeList";
+import { getCommentsForPosts } from "../../Services/Comments";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -11,21 +11,19 @@ export default function Home() {
     async function fetchPosts() {
       try {
         const data = await getPosts();
-        console.log("fetched posts: ", data);
         setPosts(data);
       } catch (error) {
-        console.error("error fetching posts", error);
+        console.error("Error fetching posts", error);
       }
     }
     fetchPosts();
-  }, []); //maybe here?
+  }, []);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     if (!newPost.trim()) return;
 
-    // Simulate saving to database
-    const savedPost = { id: Date.now(), content: newPost };
+    const savedPost = { id: Date.now(), title: "New Post", body: newPost };
     setPosts([savedPost, ...posts]);
     setNewPost("");
   };
@@ -35,22 +33,14 @@ export default function Home() {
       <h1>Welcome to your feed!</h1>
       <p>Here you can see all the posts from your friends.</p>
 
-      {/* Show what the user posted on the home screen */}
-      <div>
-        {posts.map((post) => (
-          <div key={post.id} style={{
-            border: "1px solid #ccc",
-            padding: "10px",
-            margin: "10px 0",
-            borderRadius: "5px",
-            backgroundColor: "#f9f9f9"
-          }}>
-            {post.content}
-          </div>
-        ))}
-      </div>
+      {posts.length > 0 && (
+        <div>
+          {posts.map((post) => (
+            <PostItem key={post.id} post={post} />
+          ))}
+        </div>
+      )}
 
-      {/* Form to post something to the screen and save to database */}
       <form onSubmit={handlePostSubmit}>
         <label>
           Post:
@@ -62,15 +52,56 @@ export default function Home() {
         </label>
         <button type="submit">Post</button>
       </form>
-      {/* <div> 
-        <HomeList />
-      </div> */}
 
-      {/* Future implementation: Add code to show posts from database */}
-      <HomeList posts={posts} />
-
-      {/* Show footer on this page */}
       <Footer />
+    </div>
+  );
+}
+
+function PostItem({ post }) {
+  const [comments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState(false);
+
+  const fetchComments = async () => {
+    if (!showComments) {
+      try {
+        const data = await getCommentsForPosts(post.id);
+        setComments(data);
+      } catch (error) {
+        console.error("Error fetching comments", error);
+      }
+    }
+    setShowComments(!showComments);
+  };
+
+  return (
+    <div
+      style={{
+        border: "1px solid #ccc",
+        padding: "10px",
+        margin: "10px 0",
+        borderRadius: "5px",
+        backgroundColor: "#f9f9f9",
+      }}
+    >
+      <h2>{post.title}</h2>
+      <p>{post.body}</p>
+      <button onClick={fetchComments} style={{ color: "blue", cursor: "pointer", background: "none", border: "none" }}>
+        {showComments ? "Hide Comments" : "View Comments"}
+      </button>
+      {showComments && (
+        <div className="comments-section">
+          {comments.length > 0 ? (
+            <ul>
+              {comments.map((comment) => (
+                <li key={comment.id}>{comment.body}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No comments yet.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
