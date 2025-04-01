@@ -3,8 +3,8 @@ import { getCommentsForPosts } from "../../Services/Comments";
 
 const HomeItem = ({ id, title, body }) => {
     const [comments, setComments] = useState([]);
-    console.log(id);
 
+    // Asynchronous function to retrieve comments for posts by the posts id
     useEffect(() => {
         async function fetchComments() {
             const data = await getCommentsForPosts(id);
