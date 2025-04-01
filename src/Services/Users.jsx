@@ -47,3 +47,8 @@ export const getUser = async () => {
     return [];
   }
 };
+
+//new for feature 5 authentication
+export const checkUser = () => {
+  return Parse.User.current()?.authenticated;
+}
