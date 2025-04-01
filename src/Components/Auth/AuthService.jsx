@@ -40,6 +40,16 @@ export const loginUser = (currUser) => {
     });
 };
 
+//logout user using async so that it waits for the logout to complete before reloading the page
+export const logoutUser = async () => {
+  try {
+    await Parse.User.logOut(); // Waits for the logout to complete
+    window.location.reload(); // Ensures UI updates properly
+  } catch (error) {
+    console.error("Logout error:", error.message);
+  }
+};
+
 export const checkUser = () => {
   return !!Parse.User.current(); // Returns true if a user is logged in
 };

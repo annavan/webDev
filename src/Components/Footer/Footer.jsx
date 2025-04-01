@@ -6,7 +6,7 @@ const Footer = () => {
             <nav>
                 <ul>
                     <li>
-                        <Link to="/home">Home</Link>
+                        <Link to="/">Home</Link>
                     </li>
                     <li>
                         <Link to="/settings">Settings</Link>
