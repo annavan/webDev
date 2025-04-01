@@ -41,5 +41,5 @@ export const loginUser = (currUser) => {
 };
 
 export const checkUser = () => {
-  return Parse.User.current()?.authenticated;
+  return !!Parse.User.current(); // Returns true if a user is logged in
 };

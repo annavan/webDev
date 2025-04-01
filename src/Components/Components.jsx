@@ -10,6 +10,8 @@ import AuthRegister from "./Auth/AuthRegister";
 import AuthLogin from "./Auth/AuthLogin";
 import ProtectedRoute from "../Services/ProtectedRoute.jsx";
 import MainList from "./Main/MainList.jsx";
+//home to navigate as protected route
+import Home from "./Home/Home.jsx";
 
 export default function Components() {
   return (
@@ -20,7 +22,7 @@ export default function Components() {
         <Route path="/auth/login" element={<AuthLogin />} />
         <Route
           path="/"
-          element={<ProtectedRoute path="/" element={MainList} />}
+          element={<ProtectedRoute path="/" element={Home} />}
         />
         <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
