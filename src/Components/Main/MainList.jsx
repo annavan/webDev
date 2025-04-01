@@ -1,10 +1,16 @@
 import React from "react";
+// import Parse from "parse";
 
-const MainList = ({ users = [], onNumUsersClick }) => {
+/* STATEFUL PARENT COMPONENT */
+const MainList = () => {
+  // Variables in the state to hold data
+  // var user = Parse.User.current();
   return (
     <div>
       <hr />
-      <button onClick={onNumUsersClick}>Show Number of Users</button>
+      This is the main list parent component.
+      {/* {user?.get("username")} */}
+      {/* Stateless Child component passing up events from form */}
     </div>
   );
 };
