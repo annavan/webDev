@@ -1,8 +1,25 @@
 # Change Log
-Changes throughout the process of creating ecah feature will be documented here
+Changes throughout the process of creating each feature will be documented here
+
+## [0.3.0] - 2025-04-02
+This is our submission for Feature 5 which focused on bringing in authentication methods and establishing protected routes
+
+### Added
+- Protected routes to prevent unauthenticated users from accessing the home and settings page
+- Redirect logged in users away from the login and register pages
+- Proper login and register functionality
+- Logout functionality 
+
+### Changed
+- Modified our login to be a true login, meaning users only have to provide less information (just username and password)
+- Changed our old login format to be our register format
+- Converted our Login component to be a larger Auth component with child components for login and register
+
+### Fixed
+- Made sure the footer and navbar show up on the home page
 
 ## [0.2.0] - 2025-03-07
-This is out submission for Feature 4 which 
+This is our submission for Feature 4 which we:
 
 ### Added
 - Routing capabilities for our navigation bar using react-router-dom

@@ -9,10 +9,8 @@ const ProtectedRoute = ({ element: Component, ...rest }) => {
   if (checkUser()) {
     console.log("Authenticated");
   }
-  const navigate = useNavigate();
-  const goBackHandler = () => {
-    navigate("/auth");
-  };
+  //const navigate = useNavigate();
+ 
   if (checkUser()) {
     return <Component />;
   } else {
