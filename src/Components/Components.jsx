@@ -14,6 +14,7 @@ import ProtectedRoute from "../Services/ProtectedRoute.jsx";
 import Home from "./Home/Home.jsx";
 import Settings from "./Settings/Settings.jsx";
 import NavBar from "./NavBar.jsx";
+import AccountSettings from "./AccountSettings/AccountSettings.jsx";
 
 export default function Components() {
   return (
@@ -31,6 +32,10 @@ export default function Components() {
         <Route
           path="/"
           element={<ProtectedRoute path="/" element={Home} />}
+        />
+        <Route
+          path="/account-settings"
+          element={<ProtectedRoute path="/account-settings" element={AccountSettings} />}
         />
         <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
