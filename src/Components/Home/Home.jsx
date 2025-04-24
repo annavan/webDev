@@ -1,13 +1,14 @@
 import Footer from "../Footer/Footer";
 import { useState, useEffect } from "react";
-import { getPosts } from "../../Services/Posts.jsx";
+import { getPosts, createPost } from "../../Services/Posts.jsx";
 import { getCommentsForPosts } from "../../Services/Comments";
-import { Container, Card, Form, Button, ListGroup, ButtonGroup, Row, Col } from 'react-bootstrap';
+import { Container, Card, Form, Button, ListGroup, ButtonGroup, Row, Col, Alert } from 'react-bootstrap';
 import { HandThumbsUp, HandThumbsDown } from 'react-bootstrap-icons';
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchPosts() {
@@ -16,6 +17,7 @@ export default function Home() {
         setPosts(data);
       } catch (error) {
         console.error("Error fetching posts", error);
+        setError("Failed to load posts");
       }
     }
     fetchPosts();
@@ -25,15 +27,27 @@ export default function Home() {
     e.preventDefault();
     if (!newPost.trim()) return;
 
-    const savedPost = { id: Date.now(), title: "New Post", body: newPost };
-    setPosts([savedPost, ...posts]);
-    setNewPost("");
+    try {
+      const savedPost = await createPost("New Post", newPost);
+      setPosts([savedPost, ...posts]);
+      setNewPost("");
+      setError(null);
+    } catch (error) {
+      console.error("Error creating post:", error);
+      setError("Failed to create post. Please try again.");
+    }
   };
 
   return (
     <Container className="py-4">
       <Row className="justify-content-center">
         <Col xs={12} md={11} lg={10} xl={9}>
+          {error && (
+            <Alert variant="danger" onClose={() => setError(null)} dismissible>
+              {error}
+            </Alert>
+          )}
+          
           <Card className="mb-4 shadow-sm">
             <Card.Body>
               <Card.Title className="display-4 text-center">Welcome to your feed!</Card.Title>
@@ -124,7 +138,12 @@ function PostItem({ post }) {
   return (
     <Card className="mb-3 shadow-sm">
       <Card.Body>
-        <Card.Title>{post.title}</Card.Title>
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <Card.Title className="mb-0">{post.title}</Card.Title>
+          <small className="text-muted">
+            Posted by: {post.author?.username || "Anonymous"}
+          </small>
+        </div>
         <Card.Text>{post.body}</Card.Text>
         
         <ButtonGroup className="mb-3">
