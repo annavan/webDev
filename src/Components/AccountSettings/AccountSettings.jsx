@@ -11,10 +11,13 @@ import Footer from "../Footer/Footer";
 
 export default function AccountSettings() {
   return (
-    <div>
-      <h1>Account Settings</h1>
+    <div className="min-h-screen flex flex-col items-center justify-between">
+    <div className="container mt-12 pt-5">
+      <h1 className="mb-4">Account Settings</h1>
       <AccountSettingsForm />
+      </div>
       <Footer />
     </div>
   );
 }
+

@@ -1,3 +1,4 @@
+@import "tailwindcss";
 /* change all text color to black */
 * {
   color: black;
@@ -17,4 +18,8 @@ input {
 /* change background color to white */
 body {
   background-color: white;
+}
+
+#root {
+  width: 100%;
 }

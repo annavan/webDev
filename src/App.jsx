@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import Components from "./Components/Components.jsx";
 import './App.css'
+
 //import * as Env from './environments.js'
 import Parse from 'parse'
 
 const Env = {
   APPLICATION_ID: "mHEinGaD7EJLQNC9sXnY5fqHVPys1SAgPH428T3j",
   JAVASCRIPT_KEY: "ZjOrgNXKZOQkMsyD8KVtTdXWWh76lwpxil33xeNX",
+  // change server url to live query url
   SERVER_URL: "https://parseapi.back4app.com"
 };
 

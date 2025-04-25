@@ -4,58 +4,34 @@ import { checkUser, logoutUser } from "./Auth/AuthService";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const isAuthenticated = checkUser(); // Check if user is logged in
+  const isAuthenticated = checkUser();
 
   const handleLogout = async () => {
     await logoutUser();
-    navigate("/auth"); // Redirect to login after logout
+    navigate("/auth");
   };
 
-  if(!isAuthenticated) {
-    return null; // Don't render the navbar if not authenticated
-  }
+  if (!isAuthenticated) return null;
 
   return (
-    <nav style={styles.navbar}>
-      <Link to="/" style={styles.logo}>Home</Link>
-      {isAuthenticated && (
-        <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
-      )}
+    <nav className="h-16 flex justify-between items-center px-6 bg-gray-800 text-white fixed w-full top-0 left-0 shadow-md z-50">
+      <div className="flex items-center space-x-6">
+        <Link to="/" className="text-xl font-semibold text-white hover:text-gray-300 transition-colors">
+          Home
+        </Link>
+        <Link to="/settings" className="text-xl font-semibold text-white hover:text-gray-300 transition-colors">
+          Settings
+        </Link>
+      </div>
+
+      <button
+        onClick={handleLogout}
+        className="bg-gray-700 hover:bg-gray-600 border border-transparent px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors"
+      >
+        Logout
+      </button>
     </nav>
   );
-};
-
-
-const styles = {
-    navbar: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      padding: "10px 20px",
-      backgroundColor: "#333",
-      color: "#fff",
-      position: "fixed",
-      width: "100%",
-      top: 0,
-      left: 0,
-    },
-    logo: {
-      textDecoration: "none",
-      color: "#fff",
-      fontSize: "1.5rem",
-    },
-    logoutButton: {
-      backgroundColor: "#1a1a1a", // Matches the button background in the CSS file
-      color: "#fff",
-      border: "1px solid transparent",
-      padding: "0.6em 1.2em",
-      fontSize: "1em",
-      fontWeight: "500",
-      borderRadius: "8px", // Matches the button style in the CSS file
-      cursor: "pointer",
-      transition: "border-color 0.25s",
-      marginRight: "20px", // Add a margin to the right to slightly move it to the left
-    },
 };
 
 export default NavBar;

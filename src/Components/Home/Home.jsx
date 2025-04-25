@@ -29,7 +29,7 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className="container mt-12 pt-5">
       <h1>Welcome to your feed!</h1>
       <p>Here you can see all the posts from your friends.</p>
 
