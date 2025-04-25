@@ -20,6 +20,8 @@ body {
   background-color: white;
 }
 
+/* make root div full width */
 #root {
   width: 100%;
+  max-width: 100%;
 }
