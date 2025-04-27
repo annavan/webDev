@@ -1,29 +1,34 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { checkUser } from "./AuthService";
 
 const AuthModule = () => {
-  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // redirect already authenticated users back to home
   useEffect(() => {
-    if (checkUser()) {
-      alert("You are already logged in");
-      navigate("/");
-    }
-  }, [navigate]);
+    const user = checkUser();
+    setIsAuthenticated(user);
+  }, []);
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
-    <div>
-      <Link to="/auth/register">
-        <button>Register</button>
-      </Link>
-      <br />
-      <br />
-      <Link to="/auth/login">
-        <button>Login</button>
-      </Link>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6 text-center">
+          <h2 className="mb-4">Welcome to Our App</h2>
+          <div className="d-grid gap-3">
+            <Link to="/auth/register" className="btn btn-primary btn-lg">
+              Register
+            </Link>
+            <Link to="/auth/login" className="btn btn-secondary btn-lg">
+              Login
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

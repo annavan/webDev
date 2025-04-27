@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
     "@tailwindcss/vite": "^4.1.4",
     "bootstrap": "^5.3.5",
     "parse": "^6.0.0",
@@ -31,4 +35,4 @@
     "globals": "^15.15.0",
     "vite": "^6.2.0"
   }
-} 
+}

@@ -23,30 +23,35 @@ export const createUser = (newUser) => {
 
 // used in auth login component
 export const loginUser = (currUser) => {
-  const user = new Parse.User();
-
-  user.set("password", currUser.password);
-  user.set("username", currUser.email);
-
-  console.log("User: ", user);
-  console.log();
-  return user
-    .logIn(user.email, user.password)
-    .then((currUserSaved) => {
-      return currUserSaved;
+  return Parse.User
+    .logIn(currUser.email, currUser.password)
+    .then((user) => {
+      return user;
     })
     .catch((error) => {
       alert(`Error: ${error.message}`);
+      return null;
     });
 };
 
 //logout user using async so that it waits for the logout to complete before reloading the page
 export const logoutUser = async () => {
   try {
-    await Parse.User.logOut(); // Waits for the logout to complete
-    window.location.reload(); // Ensures UI updates properly
+    // Clear the current user from Parse
+    await Parse.User.logOut();
+    
+    // Clear any stored session data
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Force a hard reload to clear any cached state
+    window.location.href = '/auth';
   } catch (error) {
     console.error("Logout error:", error.message);
+    // Even if there's an error, we should still try to clear local state
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/auth';
   }
 };
 

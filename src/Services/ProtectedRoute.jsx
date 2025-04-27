@@ -1,23 +1,21 @@
 import React from "react";
-import { useNavigate, Navigate } from "react-router-dom";
-import { checkUser } from "../Components/Auth/AuthService";
+import { Navigate } from "react-router-dom";
+import Parse from 'parse';
 
-// You can pass props using the spread operator to throw them on an object if there are too many to break out
-const ProtectedRoute = ({ element: Component, ...rest }) => {
-  console.log("element: ", Component);
-  //if user is authenticated, print it
-  if (checkUser()) {
-    console.log("Authenticated");
-  }
-  //const navigate = useNavigate();
- 
-  if (checkUser()) {
-    return <Component />;
-  } else {
-    // if user is not authenticated, redirect them to the login page
+const ProtectedRoute = ({ children }) => {
+  const currentUser = Parse.User.current();
+  
+  if (!currentUser) {
+    // User is not authenticated, redirect to auth page
     return <Navigate to="/auth" replace />;
   }
 
+  // User is authenticated, render the protected content
+  return (
+    <div className="protected-content">
+      {children}
+    </div>
+  );
 };
 
 export default ProtectedRoute;

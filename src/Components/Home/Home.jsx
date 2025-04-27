@@ -4,17 +4,21 @@ import { getPosts, createPost } from "../../Services/Posts.jsx";
 import { getCommentsForPosts } from "../../Services/Comments";
 import { Container, Card, Form, Button, ListGroup, ButtonGroup, Row, Col, Alert } from 'react-bootstrap';
 import { HandThumbsUp, HandThumbsDown } from 'react-bootstrap-icons';
+import AuthorFilter from './AuthorFilter';
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [error, setError] = useState(null);
+  const [selectedAuthor, setSelectedAuthor] = useState("");
 
   useEffect(() => {
     async function fetchPosts() {
       try {
         const data = await getPosts();
         setPosts(data);
+        setFilteredPosts(data);
       } catch (error) {
         console.error("Error fetching posts", error);
         setError("Failed to load posts");
@@ -22,6 +26,18 @@ export default function Home() {
     }
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    if (selectedAuthor) {
+      const filtered = posts.filter(post => 
+        post.author?.username === selectedAuthor || 
+        (post.author === null && selectedAuthor === 'Anonymous')
+      );
+      setFilteredPosts(filtered);
+    } else {
+      setFilteredPosts(posts);
+    }
+  }, [selectedAuthor, posts]);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +55,7 @@ export default function Home() {
   };
 
   return (
-    <Container className="py-4">
+    <Container className="pt-20 pb-4">
       <Row className="justify-content-center">
         <Col xs={12} md={11} lg={10} xl={9}>
           {error && (
@@ -57,6 +73,7 @@ export default function Home() {
 
           <Card className="mb-4 shadow-sm">
             <Card.Body>
+              <AuthorFilter onFilterChange={setSelectedAuthor} />
               <Form onSubmit={handlePostSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label>Create a new post</Form.Label>
@@ -77,12 +94,16 @@ export default function Home() {
             </Card.Body>
           </Card>
 
-          {posts.length > 0 && (
+          {filteredPosts.length > 0 ? (
             <div>
-              {posts.map((post) => (
+              {filteredPosts.map((post) => (
                 <PostItem key={post.id} post={post} />
               ))}
             </div>
+          ) : (
+            <Alert variant="info">
+              No posts found for the selected author.
+            </Alert>
           )}
         </Col>
       </Row>
