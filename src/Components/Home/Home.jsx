@@ -11,6 +11,7 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
+  const [newPostTitle, setNewPostTitle] = useState("");
   const [error, setError] = useState(null);
   const [selectedAuthor, setSelectedAuthor] = useState("");
 
@@ -81,12 +82,16 @@ export default function Home() {
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
-    if (!newPost.trim()) return;
+    if (!newPost.trim() || !newPostTitle.trim()) {
+      setError("Please provide both a title and content for your post");
+      return;
+    }
 
     try {
       await createPost("New Post", newPost); 
       // DO NOT manually setPosts here! LiveQuery will handle it
       setNewPost("");
+      setNewPostTitle("");
       setError(null);
     } catch (err) {
       console.error("Error creating post:", err);
@@ -116,13 +121,24 @@ export default function Home() {
               <AuthorFilter onFilterChange={setSelectedAuthor} />
               <Form onSubmit={handlePostSubmit}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Create a new post</Form.Label>
+                  <Form.Label>Post Title</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={newPostTitle}
+                    onChange={(e) => setNewPostTitle(e.target.value)}
+                    placeholder="Enter a title for your post"
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Post Content</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
                     value={newPost}
                     onChange={(e) => setNewPost(e.target.value)}
                     placeholder="What's on your mind?"
+                    required
                   />
                 </Form.Group>
                 <div className="d-grid">
