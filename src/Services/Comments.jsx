@@ -24,3 +24,37 @@ export async function getCommentsForPosts(postId) {
         return [];
     }
 }
+
+export async function createComment(postId, body) {
+    const Comment = Parse.Object.extend("Comment");
+    const comment = new Comment();
+
+    const Post = Parse.Object.extend("Post");
+    const postPointer = new Post();
+    postPointer.id = postId;
+
+    comment.set("post", postPointer);  // Set the pointer to the post
+    comment.set("body", body);
+
+    // Optional: link comment to current user
+    const currentUser = Parse.User.current();
+    if (currentUser) {
+        comment.set("author", currentUser);
+        comment.set("name", currentUser.get("username")); // or full name
+    } else {
+        comment.set("name", "Anonymous");
+    }
+
+    try {
+        const savedComment = await comment.save();
+        return {
+            id: savedComment.id,
+            body: savedComment.get("body"),
+            name: savedComment.get("name"),
+            post: postId
+        };
+    } catch (error) {
+        console.error("Error creating comment:", error);
+        throw error;
+    }
+}

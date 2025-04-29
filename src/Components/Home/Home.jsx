@@ -1,10 +1,11 @@
 import Footer from "../Footer/Footer";
 import { useState, useEffect } from "react";
 import { getPosts, createPost } from "../../Services/Posts.jsx";
-import { getCommentsForPosts } from "../../Services/Comments";
+import { getCommentsForPosts, createComment } from "../../Services/Comments.jsx";
 import { Container, Card, Form, Button, ListGroup, ButtonGroup, Row, Col, Alert } from 'react-bootstrap';
 import { HandThumbsUp, HandThumbsDown } from 'react-bootstrap-icons';
 import AuthorFilter from './AuthorFilter';
+import Parse from "parse";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -14,23 +15,62 @@ export default function Home() {
   const [selectedAuthor, setSelectedAuthor] = useState("");
 
   useEffect(() => {
-    async function fetchPosts() {
+    async function setupLiveQuery() {
       try {
         const data = await getPosts();
         setPosts(data);
         setFilteredPosts(data);
-      } catch (error) {
-        console.error("Error fetching posts", error);
-        setError("Failed to load posts");
+
+        // Setup LiveQuery for posts
+        const Post = Parse.Object.extend("Post");
+        const postQuery = new Parse.Query(Post);
+        postQuery.descending("createdAt");
+
+        const postSubscription = await postQuery.subscribe();
+
+        postSubscription.on("create", (newPost) => {
+          const newPostData = {
+            id: newPost.id,
+            title: newPost.get("title") || "Untitled",
+            body: newPost.get("body") || "No content",
+            author: newPost.get("author") ? {
+              id: newPost.get("author").id,
+              username: newPost.get("author").get("username") || "Anonymous"
+            } : null
+          };
+        
+          setPosts(prev => {
+            if (prev.find(p => p.id === newPostData.id)) return prev; // ALREADY exists
+            return [newPostData, ...prev];
+          });
+        
+          setFilteredPosts(prev => {
+            if (prev.find(p => p.id === newPostData.id)) return prev; // ALREADY exists
+            return [newPostData, ...prev];
+          });
+        });
+
+        postSubscription.on("delete", (deletedPost) => {
+          setPosts((prev) => prev.filter((p) => p.id !== deletedPost.id));
+          setFilteredPosts((prev) => prev.filter((p) => p.id !== deletedPost.id));
+        });
+
+        return () => {
+          postSubscription.unsubscribe();
+        };
+      } catch (err) {
+        console.error("Error setting up LiveQuery:", err);
+        setError("Failed to connect to LiveQuery server.");
       }
     }
-    fetchPosts();
+
+    setupLiveQuery();
   }, []);
 
   useEffect(() => {
     if (selectedAuthor) {
-      const filtered = posts.filter(post => 
-        post.author?.username === selectedAuthor || 
+      const filtered = posts.filter(post =>
+        post.author?.username === selectedAuthor ||
         (post.author === null && selectedAuthor === 'Anonymous')
       );
       setFilteredPosts(filtered);
@@ -44,12 +84,12 @@ export default function Home() {
     if (!newPost.trim()) return;
 
     try {
-      const savedPost = await createPost("New Post", newPost);
-      setPosts([savedPost, ...posts]);
+      await createPost("New Post", newPost); 
+      // DO NOT manually setPosts here! LiveQuery will handle it
       setNewPost("");
       setError(null);
-    } catch (error) {
-      console.error("Error creating post:", error);
+    } catch (err) {
+      console.error("Error creating post:", err);
       setError("Failed to create post. Please try again.");
     }
   };
@@ -63,7 +103,7 @@ export default function Home() {
               {error}
             </Alert>
           )}
-          
+
           <Card className="mb-4 shadow-sm">
             <Card.Body>
               <Card.Title className="display-4 text-center">Welcome to your feed!</Card.Title>
@@ -115,46 +155,95 @@ function PostItem({ post }) {
   const [comments, setComments] = useState([]);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
-  const [userReaction, setUserReaction] = useState(null); // 'like', 'dislike', or null
+  const [userReaction, setUserReaction] = useState(null);
+  const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    async function setupCommentsLiveQuery() {
+      try {
+        const data = await getCommentsForPosts(post.id);
+        setComments(data);
+
+        const Comment = Parse.Object.extend("Comment");
+        const commentQuery = new Parse.Query(Comment);
+        const postPointer = new Parse.Object("Post");
+        postPointer.id = post.id;
+        commentQuery.equalTo("post", postPointer);
+
+        const commentSubscription = await commentQuery.subscribe();
+
+        commentSubscription.on("create", (newComment) => {
+          const newCommentData = {
+            id: newComment.id,
+            body: newComment.get("body"),
+            name: newComment.get("name"),
+            post: post.id
+          };
+        
+          setComments(prev => {
+            if (prev.find(c => c.id === newCommentData.id)) return prev; // ALREADY exists
+            return [...prev, newCommentData];
+          });
+        });
+        
+
+        commentSubscription.on("delete", (deletedComment) => {
+          setComments((prev) => prev.filter((c) => c.id !== deletedComment.id));
+        });
+
+        return () => {
+          commentSubscription.unsubscribe();
+        };
+      } catch (err) {
+        console.error("Error setting up comment LiveQuery:", err);
+      }
+    }
+
+    setupCommentsLiveQuery();
+  }, [post.id]);
 
   const handleLike = () => {
     if (userReaction === 'like') {
-      setLikes(prev => prev - 1);
+      setLikes((prev) => prev - 1);
       setUserReaction(null);
     } else {
       if (userReaction === 'dislike') {
-        setDislikes(prev => prev - 1);
+        setDislikes((prev) => prev - 1);
       }
-      setLikes(prev => prev + 1);
+      setLikes((prev) => prev + 1);
       setUserReaction('like');
     }
   };
 
   const handleDislike = () => {
     if (userReaction === 'dislike') {
-      setDislikes(prev => prev - 1);
+      setDislikes((prev) => prev - 1);
       setUserReaction(null);
     } else {
       if (userReaction === 'like') {
-        setLikes(prev => prev - 1);
+        setLikes((prev) => prev - 1);
       }
-      setDislikes(prev => prev + 1);
+      setDislikes((prev) => prev + 1);
       setUserReaction('dislike');
     }
   };
 
-  const fetchComments = async () => {
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
     try {
-      const data = await getCommentsForPosts(post.id);
-      setComments(data);
-    } catch (error) {
-      console.error("Error fetching comments", error);
+      setSubmitting(true);
+      await createComment(post.id, newComment);
+      setNewComment("");
+      // DO NOT manually setComments here! LiveQuery will handle it
+    } catch (err) {
+      console.error("Error creating comment:", err);
+    } finally {
+      setSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    fetchComments();
-  }, [post.id]);
 
   return (
     <Card className="mb-3 shadow-sm">
@@ -166,9 +255,9 @@ function PostItem({ post }) {
           </small>
         </div>
         <Card.Text>{post.body}</Card.Text>
-        
+
         <ButtonGroup className="mb-3">
-          <Button 
+          <Button
             variant={userReaction === 'like' ? 'primary' : 'outline-primary'}
             onClick={handleLike}
             size="sm"
@@ -176,7 +265,7 @@ function PostItem({ post }) {
             <HandThumbsUp className="me-1" />
             {likes}
           </Button>
-          <Button 
+          <Button
             variant={userReaction === 'dislike' ? 'danger' : 'outline-danger'}
             onClick={handleDislike}
             size="sm"
@@ -190,11 +279,28 @@ function PostItem({ post }) {
           <ListGroup variant="flush">
             {comments.map((comment) => (
               <ListGroup.Item key={comment.id}>
-                <strong>{comment.name}</strong>: {comment.body}
+                <strong>{comment.name || "Anonymous"}</strong>: {comment.body}
               </ListGroup.Item>
             ))}
           </ListGroup>
         )}
+
+        <Form onSubmit={handleCommentSubmit} className="mt-3">
+          <Form.Group>
+            <Form.Control
+              type="text"
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              disabled={submitting}
+            />
+          </Form.Group>
+          <div className="d-grid gap-2 mt-2">
+            <Button variant="success" type="submit" size="sm" disabled={submitting}>
+              {submitting ? "Posting..." : "Post Comment"}
+            </Button>
+          </div>
+        </Form>
       </Card.Body>
     </Card>
   );
