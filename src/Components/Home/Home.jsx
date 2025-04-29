@@ -19,13 +19,15 @@ export default function Home() {
     async function setupLiveQuery() {
       try {
         const data = await getPosts();
-        setPosts(data);
-        setFilteredPosts(data);
+        // Sort the initial data by createdAt in descending order
+        const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setPosts(sortedData);
+        setFilteredPosts(sortedData);
 
         // Setup LiveQuery for posts
         const Post = Parse.Object.extend("Post");
         const postQuery = new Parse.Query(Post);
-        postQuery.descending("createdAt");
+        postQuery.descending("createdAt"); // Order by creation date, newest first
         postQuery.include("author"); // Include the author pointer
 
         const postSubscription = await postQuery.subscribe();
@@ -51,16 +53,19 @@ export default function Home() {
             id: newPost.id,
             title: newPost.get("title") || "Untitled",
             body: newPost.get("body") || "No content",
-            author: authorData
+            author: authorData,
+            createdAt: newPost.get("createdAt") // Include createdAt in the post data
           };
         
           setPosts(prev => {
             if (prev.find(p => p.id === newPostData.id)) return prev;
+            // Insert new post at the beginning of the array
             return [newPostData, ...prev];
           });
         
           setFilteredPosts(prev => {
             if (prev.find(p => p.id === newPostData.id)) return prev;
+            // Insert new post at the beginning of the array
             return [newPostData, ...prev];
           });
         });

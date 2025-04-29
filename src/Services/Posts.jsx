@@ -5,6 +5,7 @@ export async function getPosts() {
     const Post = Parse.Object.extend("Post");
     const query = new Parse.Query(Post);
     query.include("author"); // Include the author pointer
+    query.descending("createdAt"); // Order by creation date, newest first
     
     try {
       const results = await query.find();
@@ -19,7 +20,8 @@ export async function getPosts() {
             author: {
               id: author.id,
               username: author.get("username")
-            }
+            },
+            createdAt: post.get("createdAt")
           };
         }
         // If author doesn't exist, try to fetch it from the database
@@ -36,7 +38,8 @@ export async function getPosts() {
               author: {
                 id: user.id,
                 username: user.get("username")
-              }
+              },
+              createdAt: post.get("createdAt")
             };
           }
         }
@@ -45,7 +48,8 @@ export async function getPosts() {
           id: post.id,
           title: post.get("title") || "Untitled",
           body: post.get("body") || "No content",
-          author: null
+          author: null,
+          createdAt: post.get("createdAt")
         };
       }));
     } catch (error) {
