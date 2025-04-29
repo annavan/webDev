@@ -29,7 +29,7 @@ const AuthModule = () => {
           <div className="row h-100 align-items-center">
             <div className="col-12 text-center">
               <h1 className="display-4 fw-bold text-white mb-4">
-                Site Title
+                ND Link
               </h1>
               <p className="lead text-white">
                 Connect with your fellow Notre Dame students.
@@ -103,11 +103,6 @@ const AuthModule = () => {
 
       {/* Footer */}
       <footer className="py-4" style={{ backgroundColor: '#0C2340' }}>
-        <div className="container">
-          <div className="text-center" style={{ color: '#00843D' }}>
-            <p className="mb-0">© 2024 Notre Dame Social Network. All rights reserved.</p>
-          </div>
-        </div>
       </footer>
     </div>
   );

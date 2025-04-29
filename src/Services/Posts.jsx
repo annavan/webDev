@@ -81,8 +81,8 @@ export async function createPost(title, body) {
             title: savedPost.get("title"),
             body: savedPost.get("body"),
             author: currentUser ? {
-                id: currentUser.id,
-                username: currentUser.get("username")
+               id: currentUser.id,
+               username: currentUser.get("username")
             } : null
         };
     } catch (error) {
