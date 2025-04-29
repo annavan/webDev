@@ -8,14 +8,45 @@ export async function getPosts() {
     
     try {
       const results = await query.find();
-      return results.map(post => ({
-        id: post.id,
-        title: post.get("title") || "Untitled",
-        body: post.get("body") || "No content",
-        author: post.get("author") ? {
-          id: post.get("author").id,
-          username: post.get("author").get("username") || "Anonymous"
-        } : null
+      return await Promise.all(results.map(async post => {
+        const author = post.get("author");
+        // If author exists, fetch their username from the database
+        if (author) {
+          return {
+            id: post.id,
+            title: post.get("title") || "Untitled",
+            body: post.get("body") || "No content",
+            author: {
+              id: author.id,
+              username: author.get("username")
+            }
+          };
+        }
+        // If author doesn't exist, try to fetch it from the database
+        const authorId = post.get("authorId");
+        if (authorId) {
+          const userQuery = new Parse.Query(Parse.User);
+          userQuery.equalTo("objectId", authorId);
+          const user = await userQuery.first();
+          if (user) {
+            return {
+              id: post.id,
+              title: post.get("title") || "Untitled",
+              body: post.get("body") || "No content",
+              author: {
+                id: user.id,
+                username: user.get("username")
+              }
+            };
+          }
+        }
+        // If we can't find the author, return the post without author info
+        return {
+          id: post.id,
+          title: post.get("title") || "Untitled",
+          body: post.get("body") || "No content",
+          author: null
+        };
       }));
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -37,12 +68,14 @@ export async function createPost(title, body) {
         const currentUser = Parse.User.current();
         if (currentUser) {
             post.set("author", currentUser);
+            // Also store the author ID separately for redundancy
+            post.set("authorId", currentUser.id);
         }
         
         // Save the post
         const savedPost = await post.save();
         
-        // Return the saved post data
+        // Return the saved post data with the actual username
         return {
             id: savedPost.id,
             title: savedPost.get("title"),

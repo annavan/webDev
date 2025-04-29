@@ -10,8 +10,13 @@ const HomeList = ({ posts }) => {
        <h1>All Posts</h1>
        {posts.length > 0 ? (
             posts.map((post) => (
-                // Pass post data to HomeItem
-                <HomeItem id={post.id} title={post.title} body={post.body} />
+                <HomeItem 
+                    key={post.id}
+                    id={post.id} 
+                    title={post.title} 
+                    body={post.body}
+                    author={post.author}
+                />
             ))
         ) : (
             <p>No posts found.</p>

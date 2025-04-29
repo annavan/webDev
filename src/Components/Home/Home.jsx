@@ -26,27 +26,41 @@ export default function Home() {
         const Post = Parse.Object.extend("Post");
         const postQuery = new Parse.Query(Post);
         postQuery.descending("createdAt");
+        postQuery.include("author"); // Include the author pointer
 
         const postSubscription = await postQuery.subscribe();
 
-        postSubscription.on("create", (newPost) => {
+        postSubscription.on("create", async (newPost) => {
+          // Fetch the author information
+          const author = newPost.get("author");
+          let authorData = null;
+          
+          if (author) {
+            try {
+              await author.fetch();
+              authorData = {
+                id: author.id,
+                username: author.get("username") || "Anonymous"
+              };
+            } catch (err) {
+              console.error("Error fetching author:", err);
+            }
+          }
+
           const newPostData = {
             id: newPost.id,
             title: newPost.get("title") || "Untitled",
             body: newPost.get("body") || "No content",
-            author: newPost.get("author") ? {
-              id: newPost.get("author").id,
-              username: newPost.get("author").get("username") || "Anonymous"
-            } : null
+            author: authorData
           };
         
           setPosts(prev => {
-            if (prev.find(p => p.id === newPostData.id)) return prev; // ALREADY exists
+            if (prev.find(p => p.id === newPostData.id)) return prev;
             return [newPostData, ...prev];
           });
         
           setFilteredPosts(prev => {
-            if (prev.find(p => p.id === newPostData.id)) return prev; // ALREADY exists
+            if (prev.find(p => p.id === newPostData.id)) return prev;
             return [newPostData, ...prev];
           });
         });
@@ -100,70 +114,90 @@ export default function Home() {
   };
 
   return (
-    <Container className="pt-20 pb-4">
-      <Row className="justify-content-center">
-        <Col xs={12} md={11} lg={10} xl={9}>
-          {error && (
-            <Alert variant="danger" onClose={() => setError(null)} dismissible>
-              {error}
-            </Alert>
-          )}
-
-          <Card className="mb-4 shadow-sm">
-            <Card.Body>
-              <Card.Title className="display-4 text-center">Welcome to your feed!</Card.Title>
-              <Card.Text className="lead text-center">Here you can see all the posts from your friends.</Card.Text>
-            </Card.Body>
-          </Card>
-
-          <Card className="mb-4 shadow-sm">
-            <Card.Body>
-              <AuthorFilter onFilterChange={setSelectedAuthor} />
-              <Form onSubmit={handlePostSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Post Title</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={newPostTitle}
-                    onChange={(e) => setNewPostTitle(e.target.value)}
-                    placeholder="Enter a title for your post"
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Post Content</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={newPost}
-                    onChange={(e) => setNewPost(e.target.value)}
-                    placeholder="What's on your mind?"
-                    required
-                  />
-                </Form.Group>
-                <div className="d-grid">
-                  <Button variant="primary" type="submit">
-                    Post
-                  </Button>
-                </div>
-              </Form>
-            </Card.Body>
-          </Card>
-
-          {filteredPosts.length > 0 ? (
-            <div>
-              {filteredPosts.map((post) => (
-                <PostItem key={post.id} post={post} />
-              ))}
+    <div className="min-vh-100 bg-light">
+      {/* Hero Section */}
+      <div className="position-relative vh-25 bg-primary">
+        <div className="position-absolute top-0 start-0 w-100 h-100" 
+             style={{ 
+               background: 'linear-gradient(90deg, rgba(12,35,64,0.9) 0%, rgba(0,132,61,0.9) 100%)'
+             }}>
+        </div>
+        <div className="container position-relative h-100">
+          <div className="row h-100 align-items-center">
+            <div className="col-12 text-center">
+              <h1 className="display-4 fw-bold text-white mb-4">
+                Welcome to your feed!
+              </h1>
+              <p className="lead text-white">
+                Here you can see all the posts from your friends.
+              </p>
             </div>
-          ) : (
-            <Alert variant="info">
-              No posts found for the selected author.
-            </Alert>
-          )}
-        </Col>
-      </Row>
-    </Container>
+          </div>
+        </div>
+      </div>
+
+      <Container className="py-5">
+        <Row className="justify-content-center">
+          <Col xs={12} md={11} lg={10} xl={9}>
+            {error && (
+              <Alert variant="danger" onClose={() => setError(null)} dismissible>
+                {error}
+              </Alert>
+            )}
+
+            <Card className="mb-4 shadow-sm">
+              <Card.Body>
+                <AuthorFilter onFilterChange={setSelectedAuthor} />
+                <Form onSubmit={handlePostSubmit}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Post Title</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={newPostTitle}
+                      onChange={(e) => setNewPostTitle(e.target.value)}
+                      placeholder="Enter a title for your post"
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Post Content</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      value={newPost}
+                      onChange={(e) => setNewPost(e.target.value)}
+                      placeholder="What's on your mind?"
+                      required
+                    />
+                  </Form.Group>
+                  <div className="d-grid">
+                    <Button 
+                      variant="primary" 
+                      type="submit"
+                      style={{ backgroundColor: '#0C2340', borderColor: '#0C2340' }}
+                    >
+                      Post
+                    </Button>
+                  </div>
+                </Form>
+              </Card.Body>
+            </Card>
+
+            {filteredPosts.length > 0 ? (
+              <div>
+                {filteredPosts.map((post) => (
+                  <PostItem key={post.id} post={post} />
+                ))}
+              </div>
+            ) : (
+              <Alert variant="info">
+                No posts found for the selected author.
+              </Alert>
+            )}
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
 
@@ -262,35 +296,41 @@ function PostItem({ post }) {
   };
 
   return (
-    <Card className="mb-3 shadow-sm">
+    <Card className="mb-4 shadow-sm">
       <Card.Body>
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <Card.Title className="mb-0">{post.title}</Card.Title>
-          <small className="text-muted">
-            Posted by: {post.author?.username || "Anonymous"}
-          </small>
-        </div>
+        <Card.Title>{post.title}</Card.Title>
         <Card.Text>{post.body}</Card.Text>
-
-        <ButtonGroup className="mb-3">
-          <Button
-            variant={userReaction === 'like' ? 'primary' : 'outline-primary'}
-            onClick={handleLike}
-            size="sm"
-          >
-            <HandThumbsUp className="me-1" />
-            {likes}
-          </Button>
-          <Button
-            variant={userReaction === 'dislike' ? 'danger' : 'outline-danger'}
-            onClick={handleDislike}
-            size="sm"
-          >
-            <HandThumbsDown className="me-1" />
-            {dislikes}
-          </Button>
-        </ButtonGroup>
-
+        <div className="d-flex justify-content-between align-items-center">
+          <small className="text-muted">
+            Posted by {post.author?.username || 'Anonymous'}
+          </small>
+          <ButtonGroup>
+            <Button
+              variant={userReaction === 'like' ? 'primary' : 'outline-primary'}
+              size="sm"
+              onClick={handleLike}
+              style={{ 
+                backgroundColor: userReaction === 'like' ? '#0C2340' : 'transparent',
+                borderColor: '#0C2340',
+                color: userReaction === 'like' ? 'white' : '#0C2340'
+              }}
+            >
+              <HandThumbsUp /> {likes}
+            </Button>
+            <Button
+              variant={userReaction === 'dislike' ? 'primary' : 'outline-primary'}
+              size="sm"
+              onClick={handleDislike}
+              style={{ 
+                backgroundColor: userReaction === 'dislike' ? '#0C2340' : 'transparent',
+                borderColor: '#0C2340',
+                color: userReaction === 'dislike' ? 'white' : '#0C2340'
+              }}
+            >
+              <HandThumbsDown /> {dislikes}
+            </Button>
+          </ButtonGroup>
+        </div>
         {comments.length > 0 && (
           <ListGroup variant="flush">
             {comments.map((comment) => (

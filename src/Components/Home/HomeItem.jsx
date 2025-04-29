@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getCommentsForPosts } from "../../Services/Comments";
 
-const HomeItem = ({ id, title, body }) => {
+const HomeItem = ({ id, title, body, author }) => {
     const [comments, setComments] = useState([]);
 
     // Asynchronous function to retrieve comments for posts by the posts id
@@ -17,6 +17,11 @@ const HomeItem = ({ id, title, body }) => {
         <div className="post-card">
             <h2>{title}</h2>
             <p>{body}</p>
+            {author && (
+                <p className="post-author">
+                    Posted by: {author.username}
+                </p>
+            )}
             <h3>Comments</h3>
             {comments.length > 0 ? (
                 <ul>

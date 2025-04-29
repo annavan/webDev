@@ -43,10 +43,7 @@ const AuthRegister = () => {
 
   const onChangeHandler = (e) => {
     e.preventDefault();
-    console.log(e.target);
     const { name, value: newValue } = e.target;
-    console.log(newValue);
-
     setNewUser({
       ...newUser,
       [name]: newValue
@@ -55,18 +52,45 @@ const AuthRegister = () => {
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    console.log("submitted: ", e.target);
     setAdd(true);
   };
 
   return (
-    <div>
-      <AuthForm
-        user={newUser}
-        onChange={onChangeHandler}
-        onSubmit={onSubmitHandler}
-        isLogin={false}
-      />
+    <div className="min-vh-100 bg-light">
+      {/* Hero Section */}
+      <div className="position-relative vh-25 bg-primary">
+        <div className="position-absolute top-0 start-0 w-100 h-100" 
+             style={{ 
+               background: 'linear-gradient(90deg, rgba(12,35,64,0.9) 0%, rgba(0,132,61,0.9) 100%)'
+             }}>
+        </div>
+        <div className="container position-relative h-100">
+          <div className="row h-100 align-items-center">
+            <div className="col-12 text-center">
+              <h1 className="display-4 fw-bold text-white mb-4">
+                Register
+              </h1>
+              <p className="lead text-white">
+                Join the Notre Dame community
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Section */}
+      <div className="container py-5">
+        <div className="row justify-content-center">
+          <div className="col-md-6 col-lg-5">
+            <AuthForm
+              user={newUser}
+              onChange={onChangeHandler}
+              onSubmit={onSubmitHandler}
+              isLogin={false}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
