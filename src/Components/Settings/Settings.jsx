@@ -12,6 +12,7 @@ export default function Settings() {
         <div className="space-y-6 max-w-2xl mx-auto text-sm bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
           <ul className="space-y-4">
             <li>
+              {/* link to account settings + box to contain it */}
               <Link
                 to="/account-settings"
                 className="block w-full text-blue-600 hover:underline font-medium text-base"

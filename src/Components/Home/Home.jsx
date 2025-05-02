@@ -16,6 +16,7 @@ export default function Home() {
   const [selectedAuthor, setSelectedAuthor] = useState("");
 
   useEffect(() => {
+    // setup livequery for posts
     async function setupLiveQuery() {
       try {
         const data = await getPosts();
@@ -24,19 +25,22 @@ export default function Home() {
         setPosts(sortedData);
         setFilteredPosts(sortedData);
 
-        // Setup LiveQuery for posts
+        // livequery for posts
         const Post = Parse.Object.extend("Post");
         const postQuery = new Parse.Query(Post);
         postQuery.descending("createdAt"); // Order by creation date, newest first
         postQuery.include("author"); // Include the author pointer
 
+        // subscribe to the query
         const postSubscription = await postQuery.subscribe();
 
+        // listen for create events
         postSubscription.on("create", async (newPost) => {
           // Fetch the author information
           const author = newPost.get("author");
           let authorData = null;
           
+          // check if author is a pointer and fetch the data
           if (author) {
             try {
               await author.fetch();
@@ -48,7 +52,8 @@ export default function Home() {
               console.error("Error fetching author:", err);
             }
           }
-
+          
+          // create new post data
           const newPostData = {
             id: newPost.id,
             title: newPost.get("title") || "Untitled",
@@ -57,24 +62,28 @@ export default function Home() {
             createdAt: newPost.get("createdAt") // Include createdAt in the post data
           };
         
+          // check if the post already exists in the state
           setPosts(prev => {
             if (prev.find(p => p.id === newPostData.id)) return prev;
             // Insert new post at the beginning of the array
             return [newPostData, ...prev];
           });
         
+          // update filtered posts
           setFilteredPosts(prev => {
             if (prev.find(p => p.id === newPostData.id)) return prev;
             // Insert new post at the beginning of the array
             return [newPostData, ...prev];
           });
         });
-
+        
+        // listen for delete events
         postSubscription.on("delete", (deletedPost) => {
           setPosts((prev) => prev.filter((p) => p.id !== deletedPost.id));
           setFilteredPosts((prev) => prev.filter((p) => p.id !== deletedPost.id));
         });
-
+        
+        // return a cleanup function to unsubscribe from the livequery
         return () => {
           postSubscription.unsubscribe();
         };
@@ -84,9 +93,11 @@ export default function Home() {
       }
     }
 
+    // call the setup function
     setupLiveQuery();
   }, []);
 
+  // filter posts based on selected author
   useEffect(() => {
     if (selectedAuthor) {
       const filtered = posts.filter(post =>
@@ -99,6 +110,7 @@ export default function Home() {
     }
   }, [selectedAuthor, posts]);
 
+  // handle post submission
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     if (!newPost.trim() || !newPostTitle.trim()) {
@@ -106,6 +118,7 @@ export default function Home() {
       return;
     }
 
+    // create a new post
     try {
       await createPost(newPostTitle, newPost);
       // DO NOT manually setPosts here! LiveQuery will handle it
@@ -118,6 +131,7 @@ export default function Home() {
     }
   };
 
+  // home page styling
   return (
     <div className="min-vh-100 bg-light">
       {/* Header Section */}
@@ -206,6 +220,7 @@ export default function Home() {
   );
 }
 
+// post item component responsible for displaying a single post and its comments
 function PostItem({ post }) {
   const [comments, setComments] = useState([]);
   const [likes, setLikes] = useState(0);
@@ -214,7 +229,9 @@ function PostItem({ post }) {
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // fetch comments for the post when the component mounts
   useEffect(() => {
+    // setup livequery for comments
     async function setupCommentsLiveQuery() {
       try {
         const data = await getCommentsForPosts(post.id);
@@ -226,8 +243,10 @@ function PostItem({ post }) {
         postPointer.id = post.id;
         commentQuery.equalTo("post", postPointer);
 
+        // subscribe to the query
         const commentSubscription = await commentQuery.subscribe();
 
+        // listen for create events
         commentSubscription.on("create", (newComment) => {
           const newCommentData = {
             id: newComment.id,
@@ -236,17 +255,19 @@ function PostItem({ post }) {
             post: post.id
           };
         
+          // check if the comment already exists in the state
           setComments(prev => {
             if (prev.find(c => c.id === newCommentData.id)) return prev; // ALREADY exists
             return [...prev, newCommentData];
           });
         });
         
-
+        // listen for delete events
         commentSubscription.on("delete", (deletedComment) => {
           setComments((prev) => prev.filter((c) => c.id !== deletedComment.id));
         });
 
+        // return a cleanup function to unsubscribe from the livequery
         return () => {
           commentSubscription.unsubscribe();
         };
@@ -255,9 +276,11 @@ function PostItem({ post }) {
       }
     }
 
+    // call the setup function 
     setupCommentsLiveQuery();
   }, [post.id]);
 
+  // handle like and dislike actions
   const handleLike = () => {
     if (userReaction === 'like') {
       setLikes((prev) => prev - 1);
@@ -284,6 +307,7 @@ function PostItem({ post }) {
     }
   };
 
+  // handle comment submission
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -300,6 +324,7 @@ function PostItem({ post }) {
     }
   };
 
+  // post item styling
   return (
     <Card className="mb-4 shadow-sm">
       <Card.Body>
