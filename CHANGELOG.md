@@ -1,6 +1,23 @@
 # Change Log
 Changes throughout the process of creating each feature will be documented here
 
+## [0.4.0] - 2025-05-03
+This is our final Feature 6 submission which encompasses our individual user/developer stories integrated into the same interface
+
+### Added
+- Styling for the Home and Auth modules using Bootstrap
+- Styling for the Settings and Account Settings modules using Tailwind CSS
+- Filtering for posts by user on the home page using Material UI's autocomplete feature
+- Realtime comment updates on posts using LiveQuery 
+
+### Changed
+- The Settings page hosts the more detailed Account Settings page
+- The initial landing page has become a welcome page  with information about the site as opposed to simply providing the options for Register and Login
+
+### Fixed
+- The post title setting now works when a user creates a post, it is not automatically set as "New Post" anymore
+- Posts display the username of the poster instead of always showing "Anonymous"
+
 ## [0.3.0] - 2025-04-02
 This is our submission for Feature 5 which focused on bringing in authentication methods and establishing protected routes
 

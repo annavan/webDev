@@ -16,7 +16,7 @@ const AuthModule = () => {
 
   return (
     <div className="min-vh-100 bg-light">
-      {/* Hero Section */}
+      {/* Header */}
       <div className="position-relative" style={{ height: '400px' }}>
         <div 
           className="position-absolute top-0 start-0 w-100 h-100" 
@@ -39,7 +39,7 @@ const AuthModule = () => {
         </div>
       </div>
 
-      {/* Features Section */}
+      {/* Cards */}
       <div className="container py-5">
         <div className="row g-4">
           <div className="col-md-4">
@@ -72,13 +72,13 @@ const AuthModule = () => {
         </div>
       </div>
 
-      {/* CTA Section */}
+      {/* Navigation */}
       <div className="bg-white py-5">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-12 text-center">
               <h2 className="display-5 fw-bold mb-4">
-                Ready to get started?
+                Ready to join?
               </h2>
               <div className="d-flex justify-content-center gap-3">
                 <Link

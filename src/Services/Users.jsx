@@ -35,7 +35,7 @@ export const createUser = async (firstName, lastName, birthday, email, password)
 };
 
 // Fetch all users from Parse
-export const getUser = async () => {
+/*export const getUser = async () => {
   try {
     const User = Parse.Object.extend("_User");
     const query = new Parse.Query(User);
@@ -52,19 +52,15 @@ export const getUser = async () => {
     console.error("Error fetching users:", error);
     return [];
   }
-};
+};*/
 
 // Fetch all users from the database
 export async function getAllUsers() {
-    console.log('=== Starting getAllUsers Debug ===');
     try {
-        console.log('Creating query for _User class...');
         const User = Parse.Object.extend("_User");
         const query = new Parse.Query(User);
         
-        console.log('Executing Parse query for _User class...');
         const users = await query.find();
-        console.log(`Found ${users.length} users in the database`);
         
         const mappedUsers = users.map(user => {
             const userData = {
@@ -74,13 +70,8 @@ export async function getAllUsers() {
                 lastName: user.get("lastName"),
                 email: user.get("email")
             };
-            console.log('Processing user:', userData);
             return userData;
         });
-        
-        console.log('=== All Users in Database ===');
-        console.table(mappedUsers);
-        console.log('=== End of User List ===');
         
         return mappedUsers;
     } catch (error) {
