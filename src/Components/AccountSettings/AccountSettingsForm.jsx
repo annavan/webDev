@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Parse from "parse";
 
+// component to update user account settings
 export default function AccountSettingsForm() {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -12,8 +13,10 @@ export default function AccountSettingsForm() {
     newPassword: "",
   });
 
+  // get current user from parse
   const currentUser = Parse.User.current();
 
+  // set form data for current user
   useEffect(() => {
     if (currentUser) {
       setFormData((prev) => ({
@@ -27,6 +30,7 @@ export default function AccountSettingsForm() {
     }
   }, [currentUser]);
 
+  // handle form data change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -35,6 +39,7 @@ export default function AccountSettingsForm() {
     }));
   };
 
+  // handle form submit to update user account settings
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -58,13 +63,14 @@ export default function AccountSettingsForm() {
     }
   };
 
+  // styling
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-8 max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-200 mb-12"
     >
       <h2 className="text-2xl font-semibold text-gray-800">Update Account Details</h2>
-
+      {/* box for account details */}
       <div className="grid grid-cols-1 gap-6">
         {[
           { label: "First Name", name: "firstName", type: "text" },
